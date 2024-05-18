@@ -129,7 +129,7 @@ const TemplateEditor = ({ onSave, onCancel }) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="flex items-center mb-3"
+                      className="flex items-center relative mb-3"
                     >
                       <DragHandle />
                       <input

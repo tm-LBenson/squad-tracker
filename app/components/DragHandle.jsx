@@ -3,9 +3,9 @@ import React from 'react';
 export default function DragHandle() {
   return (
     <svg
+      className="absolute left-[-25px]"
       xmlns="http://www.w3.org/2000/svg"
-      width="1.5rem"
-      height="1.5rem"
+      width="30"
       viewBox="0 0 15 15"
     >
       <g fill="currentColor">
