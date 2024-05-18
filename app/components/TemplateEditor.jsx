@@ -11,6 +11,8 @@ import { db } from '@/firebaseConfig';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from './UserContext';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import DragHandle from './DragHandle'; // Import the DragHandle component
 
 const TemplateEditor = ({ onSave, onCancel }) => {
   const [fields, setFields] = useState([]);
@@ -101,80 +103,111 @@ const TemplateEditor = ({ onSave, onCancel }) => {
     onCancel();
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    const reorderedFields = Array.from(fields);
+    const [removed] = reorderedFields.splice(result.source.index, 1);
+    reorderedFields.splice(result.destination.index, 0, removed);
+    setFields(reorderedFields);
+  };
+
   return (
     <div className="p-6 border rounded-lg shadow-md bg-white">
       <h2 className="text-2xl font-bold mb-4">Template Editor</h2>
-      {fields.map((field, index) => (
-        <div
-          key={index}
-          className="flex items-center mb-3"
-        >
-          <input
-            type="text"
-            value={field.name}
-            onChange={(e) => {
-              if (field.editable) {
-                const newFields = [...fields];
-                newFields[index].name = e.target.value;
-                setFields(newFields);
-              }
-            }}
-            placeholder="Field Name"
-            className={
-              field.editable
-                ? 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-black'
-                : 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-slate-400'
-            }
-            disabled={!field.editable}
-          />
-          <select
-            value={field.type}
-            onChange={(e) => {
-              if (field.editable) {
-                const newFields = [...fields];
-                newFields[index].type = e.target.value;
-                setFields(newFields);
-              }
-            }}
-            className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
-            disabled={!field.editable}
-          >
-            <option value="text">Text</option>
-            <option value="date">Date</option>
-          </select>
-          <label className="flex items-center mr-2">
-            <input
-              type="checkbox"
-              checked={field.required}
-              onChange={(e) => {
-                if (field.editable) {
-                  const newFields = [...fields];
-                  newFields[index].required = e.target.checked;
-                  setFields(newFields);
-                }
-              }}
-              className="mr-1"
-              disabled={!field.editable}
-            />
-            Required
-          </label>
-          {field.editable ? (
-            <button
-              onClick={() => confirmRemoveField(index)}
-              className="p-2 bg-red-500 text-white rounded"
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="fields">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
             >
-              Remove
-            </button>
-          ) : (
-            <button
-              className="p-2 bg-slate-400 text-white rounded"
-              disabled
-            >
-              Remove
-            </button>
+              {fields.map((field, index) => (
+                <Draggable
+                  key={index}
+                  draggableId={String(index)}
+                  index={index}
+                >
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className="flex items-center mb-3"
+                    >
+                      <DragHandle />
+                      <input
+                        type="text"
+                        value={field.name}
+                        onChange={(e) => {
+                          if (field.editable) {
+                            const newFields = [...fields];
+                            newFields[index].name = e.target.value;
+                            setFields(newFields);
+                          }
+                        }}
+                        placeholder="Field Name"
+                        className={
+                          field.editable
+                            ? 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-black'
+                            : 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-slate-400'
+                        }
+                        disabled={!field.editable}
+                      />
+                      <select
+                        value={field.type}
+                        onChange={(e) => {
+                          if (field.editable) {
+                            const newFields = [...fields];
+                            newFields[index].type = e.target.value;
+                            setFields(newFields);
+                          }
+                        }}
+                        className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
+                        disabled={!field.editable}
+                      >
+                        <option value="text">Text</option>
+                        <option value="date">Date</option>
+                      </select>
+                      <label className="flex items-center mr-2">
+                        <input
+                          type="checkbox"
+                          checked={field.required}
+                          onChange={(e) => {
+                            if (field.editable) {
+                              const newFields = [...fields];
+                              newFields[index].required = e.target.checked;
+                              setFields(newFields);
+                            }
+                          }}
+                          className="mr-1"
+                          disabled={!field.editable}
+                        />
+                        Required
+                      </label>
+                      {field.editable ? (
+                        <button
+                          onClick={() => confirmRemoveField(index)}
+                          className="p-2 bg-red-500 text-white rounded"
+                        >
+                          Remove
+                        </button>
+                      ) : (
+                        <button
+                          className="p-2 bg-slate-400 text-white rounded"
+                          disabled
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
           )}
-        </div>
-      ))}
+        </Droppable>
+      </DragDropContext>
       <div className="flex space-x-2">
         <button
           onClick={addField}
