@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebaseConfig';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/firebaseConfig';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -34,6 +34,18 @@ const CompleteProfile = () => {
   const router = useRouter();
   const user = auth.currentUser;
 
+  useEffect(() => {
+    const checkUserProfile = async () => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          router.push('/'); // Redirect if profile exists
+        }
+      }
+    };
+    checkUserProfile();
+  }, [user, router]);
+
   const handleProfileCompletion = async (e) => {
     e.preventDefault();
     try {
@@ -62,105 +74,93 @@ const CompleteProfile = () => {
         <h2 className="text-2xl font-bold mb-6">Complete Your Profile</h2>
         <form onSubmit={handleProfileCompletion}>
           <div className="mb-4">
-            <label className="block text-gray-700">
-              First Name
-              <input
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                required
-              />
-            </label>
-            <label className="block text-gray-700">
-              Last Name
-              <input
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                required
-              />
-            </label>
+            <label className="block text-gray-700">First Name</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">
-              Rank
-              <select
-                value={rank}
-                onChange={(e) => setRank(e.target.value)}
-                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                required
-              >
-                <option value="">Select Rank</option>
-                {rankOptions.map((rankOption) => (
-                  <option
-                    key={rankOption}
-                    value={rankOption}
-                  >
-                    {rankOption}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <label className="block text-gray-700">Last Name</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">
-              Unit
-              <input
-                type="text"
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                required
-              />
-            </label>
+            <label className="block text-gray-700">Rank</label>
+            <select
+              value={rank}
+              onChange={(e) => setRank(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            >
+              <option value="">Select Rank</option>
+              {rankOptions.map((rankOption) => (
+                <option
+                  key={rankOption}
+                  value={rankOption}
+                >
+                  {rankOption}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">
-              Platoon
-              <input
-                type="text"
-                value={platoon}
-                onChange={(e) => setPlatoon(e.target.value)}
-                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                required
-              />
-            </label>
+            <label className="block text-gray-700">Unit</label>
+            <input
+              type="text"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">
-              Position
-              <select
-                value={position}
-                onChange={(e) => setPosition(e.target.value)}
-                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                required
-              >
-                <option value="">Select Position</option>
-                {positionOptions.map((positionOption) => (
-                  <option
-                    key={positionOption}
-                    value={positionOption}
-                  >
-                    {positionOption}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <label className="block text-gray-700">Platoon</label>
+            <input
+              type="text"
+              value={platoon}
+              onChange={(e) => setPlatoon(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Position</label>
+            <select
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            >
+              <option value="">Select Position</option>
+              {positionOptions.map((positionOption) => (
+                <option
+                  key={positionOption}
+                  value={positionOption}
+                >
+                  {positionOption}
+                </option>
+              ))}
+            </select>
           </div>
           {position === 'Squad Leader' && (
             <div className="mb-4">
-              <label className="block text-gray-700">
-                Squad Number
-                <input
-                  type="number"
-                  value={squadNumber}
-                  onChange={(e) => setSquadNumber(e.target.value)}
-                  className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
-                  required
-                />
-              </label>
+              <label className="block text-gray-700">Squad Number</label>
+              <input
+                type="number"
+                value={squadNumber}
+                onChange={(e) => setSquadNumber(e.target.value)}
+                className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+                required
+              />
             </div>
           )}
           <button
