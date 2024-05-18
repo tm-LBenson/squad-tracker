@@ -6,7 +6,8 @@ import { useUser } from '@/app/components/UserContext';
 
 const withAdminAuth = (Component) => {
   return (props) => {
-    const { user, loading } = useUser();
+    const user = useUser()?.user;
+    const loading = useUser()?.loading;
     const router = useRouter();
 
     useEffect(() => {
