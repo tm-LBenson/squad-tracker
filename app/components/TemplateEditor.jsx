@@ -18,7 +18,7 @@ const TemplateEditor = ({ onSave, onCancel }) => {
   const [showModal, setShowModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const { user } = useUser();
-  const squadLeaderId = user?.fullName;
+  const squadLeaderId = user?.uid;
 
   useEffect(() => {
     const fetchTemplate = async () => {

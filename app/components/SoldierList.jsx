@@ -15,7 +15,7 @@ const SoldierList = ({ onSelectSoldier }) => {
   const [soldiers, setSoldiers] = useState([]);
   const { user } = useUser();
 
-  const squadLeaderId = user?.fullName;
+  const squadLeaderId = user?.uid;
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'soldiers'), (snapshot) => {

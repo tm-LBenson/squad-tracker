@@ -9,13 +9,12 @@ const defaultTemplate = {
   fields: [
     { name: 'Full Name', type: 'text', required: true, editable: false },
     { name: 'Rank', type: 'text', required: true, editable: true },
-    { name: 'DOB', type: 'date', required: true, editable: true },
-    { name: 'Email', type: 'text', required: true, editable: true },
-    { name: 'Phone', type: 'text', required: true, editable: true },
-    { name: 'Address', type: 'text', required: true, editable: true },
-    { name: 'CLS', type: 'text', required: false, editable: true },
-    { name: 'CAC Expires', type: 'text', required: false, editable: true },
-    { name: 'SUTA', type: 'text', required: false, editable: true },
+    { name: 'ETS', type: 'text', required: false, editable: true },
+    { name: 'GTC', type: 'date', required: false, editable: true },
+    { name: 'Gas Mask', type: 'text', required: false, editable: true },
+    { name: 'Weapon SSN', type: 'text', required: false, editable: true },
+    { name: 'ACFT', type: 'text', required: false, editable: true },
+    { name: 'Height/Weight', type: 'text', required: true, editable: true },
   ],
 };
 
@@ -23,7 +22,7 @@ const SoldierForm = ({ selectedSoldier, onFormSubmit, isAdding }) => {
   const [template, setTemplate] = useState(null);
   const [formData, setFormData] = useState({});
   const { user } = useUser();
-  const squadLeaderId = user.fullName;
+  const squadLeaderId = user.uid;
 
   useEffect(() => {
     const fetchTemplate = async () => {

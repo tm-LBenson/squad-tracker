@@ -37,7 +37,7 @@ const AdminApproval = () => {
               className="flex justify-between items-center mb-2"
             >
               <span>
-                {user.fullName} ({user.email})
+                {user.firstName + ' ' + user.lastName} ({user.email})
               </span>
               <button
                 onClick={() => handleApprove(user.id)}
