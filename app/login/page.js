@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import LoginPage from '../components/LoginPage';
+import LoginPage from './LoginPage';
 
 export default function page() {
   return (
