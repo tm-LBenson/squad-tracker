@@ -5,7 +5,7 @@ import { getFirestore } from 'firebase/firestore';
 import { GoogleAuthProvider } from 'firebase/auth';
 import { getAuth } from 'firebase/auth';
 const firebaseConfig = {
-  apiKey: 'AIzaSyDituLUvtb6_TDql6TGxl2_Sa-0bYHDKp8',
+  apiKey: process.env.NEXT_PUBLIC_KEY,
   authDomain: 'squad-tracker-12f25.firebaseapp.com',
   projectId: 'squad-tracker-12f25',
   storageBucket: 'squad-tracker-12f25.appspot.com',
