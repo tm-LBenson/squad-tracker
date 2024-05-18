@@ -6,34 +6,14 @@ import SoldierDetails from './components/SoldierDetails';
 import TemplateEditor from './components/TemplateEditor';
 import withAuth from './components/withAuth';
 import Header from './components/Header';
-import { auth, db } from '@/firebaseConfig';
 import Loading from './loading';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
 import { useUser } from './components/UserContext';
 
 const Home = () => {
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
   const [selectedSoldier, setSelectedSoldier] = useState(null);
   const [isAddingSoldier, setIsAddingSoldier] = useState(false);
-  const { user, setUser, loading } = useUser();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-      if (authUser) {
-        const userDoc = await getDoc(doc(db, 'users', authUser.uid));
-        if (userDoc.exists()) {
-          setUser({ ...authUser, ...userDoc.data() });
-        } else {
-          setUser(authUser);
-        }
-      } else {
-        setUser(null);
-      }
-    });
-
-    return () => unsubscribe();
-  }, [setUser]);
+  const { user, loading } = useUser();
 
   const handleFormSubmit = () => {
     setSelectedSoldier(null);
