@@ -10,16 +10,15 @@ import {
 import { db } from '@/firebaseConfig';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUser } from './UserContext';
 
 const TemplateEditor = ({ onSave, onCancel }) => {
-  const [fields, setFields] = useState([
-    { name: 'name', type: 'text', required: true },
-    { name: 'rank', type: 'text', required: true },
-  ]);
+  const [fields, setFields] = useState([]);
   const [originalFields, setOriginalFields] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
-  const squadLeaderId = 'squadLeader123'; // Get this from auth context
+  const { user } = useUser();
+  const squadLeaderId = user?.fullName;
 
   useEffect(() => {
     const fetchTemplate = async () => {
@@ -28,13 +27,23 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         const templateData = templateDoc.data().fields;
         setFields(templateData);
         setOriginalFields(templateData);
+      } else {
+        // Add the default Full Name field if no template exists
+        const defaultFields = [
+          { name: 'Full Name', type: 'text', required: true, editable: false },
+        ];
+        setFields(defaultFields);
+        setOriginalFields(defaultFields);
       }
     };
     fetchTemplate();
   }, [squadLeaderId]);
 
   const addField = () => {
-    setFields([...fields, { name: '', type: 'text', required: false }]);
+    setFields([
+      ...fields,
+      { name: '', type: 'text', required: false, editable: true },
+    ]);
   };
 
   const removeField = (index) => {
@@ -104,21 +113,31 @@ const TemplateEditor = ({ onSave, onCancel }) => {
             type="text"
             value={field.name}
             onChange={(e) => {
-              const newFields = [...fields];
-              newFields[index].name = e.target.value;
-              setFields(newFields);
+              if (field.editable) {
+                const newFields = [...fields];
+                newFields[index].name = e.target.value;
+                setFields(newFields);
+              }
             }}
             placeholder="Field Name"
-            className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
+            className={
+              field.editable
+                ? 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-black'
+                : 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-slate-400'
+            }
+            disabled={!field.editable}
           />
           <select
             value={field.type}
             onChange={(e) => {
-              const newFields = [...fields];
-              newFields[index].type = e.target.value;
-              setFields(newFields);
+              if (field.editable) {
+                const newFields = [...fields];
+                newFields[index].type = e.target.value;
+                setFields(newFields);
+              }
             }}
             className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
+            disabled={!field.editable}
           >
             <option value="text">Text</option>
             <option value="date">Date</option>
@@ -128,20 +147,32 @@ const TemplateEditor = ({ onSave, onCancel }) => {
               type="checkbox"
               checked={field.required}
               onChange={(e) => {
-                const newFields = [...fields];
-                newFields[index].required = e.target.checked;
-                setFields(newFields);
+                if (field.editable) {
+                  const newFields = [...fields];
+                  newFields[index].required = e.target.checked;
+                  setFields(newFields);
+                }
               }}
               className="mr-1"
+              disabled={!field.editable}
             />
             Required
           </label>
-          <button
-            onClick={() => confirmRemoveField(index)}
-            className="p-2 bg-red-500 text-white rounded"
-          >
-            Remove
-          </button>
+          {field.editable ? (
+            <button
+              onClick={() => confirmRemoveField(index)}
+              className="p-2 bg-red-500 text-white rounded"
+            >
+              Remove
+            </button>
+          ) : (
+            <button
+              className="p-2 bg-slate-400 text-white rounded"
+              disabled
+            >
+              Remove
+            </button>
+          )}
         </div>
       ))}
       <div className="flex space-x-2">

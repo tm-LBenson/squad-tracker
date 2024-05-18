@@ -1,28 +1,29 @@
 import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc, collection, addDoc } from 'firebase/firestore';
-import { db } from '@/firebaseConfig';
+import { auth, db } from '@/firebaseConfig';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUser } from './UserContext';
 
 const defaultTemplate = {
   fields: [
-    { name: 'name', type: 'text', required: true },
-    { name: 'rank', type: 'text', required: true },
-    { name: 'dob', type: 'date', required: true },
-    { name: 'email', type: 'text', required: true },
-    { name: 'phone', type: 'text', required: true },
-    { name: 'address', type: 'text', required: true },
-    { name: 'certifications', type: 'text', required: false },
-    { name: 'schoolSchedule', type: 'text', required: false },
-    { name: 'SUTA', type: 'text', required: false },
-    { name: 'counselingDocuments', type: 'text', required: false },
+    { name: 'Full Name', type: 'text', required: true, editable: false },
+    { name: 'Rank', type: 'text', required: true, editable: true },
+    { name: 'DOB', type: 'date', required: true, editable: true },
+    { name: 'Email', type: 'text', required: true, editable: true },
+    { name: 'Phone', type: 'text', required: true, editable: true },
+    { name: 'Address', type: 'text', required: true, editable: true },
+    { name: 'CLS', type: 'text', required: false, editable: true },
+    { name: 'CAC Expires', type: 'text', required: false, editable: true },
+    { name: 'SUTA', type: 'text', required: false, editable: true },
   ],
 };
 
 const SoldierForm = ({ selectedSoldier, onFormSubmit, isAdding }) => {
   const [template, setTemplate] = useState(null);
   const [formData, setFormData] = useState({});
-  const squadLeaderId = 'squadLeader123'; // Get this from auth context
+  const { user } = useUser();
+  const squadLeaderId = user.fullName;
 
   useEffect(() => {
     const fetchTemplate = async () => {

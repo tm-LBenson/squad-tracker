@@ -9,10 +9,13 @@ import {
 import { db } from '@/firebaseConfig';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useUser } from './UserContext';
 
 const SoldierList = ({ onSelectSoldier }) => {
   const [soldiers, setSoldiers] = useState([]);
-  const squadLeaderId = 'squadLeader123'; // Get this from auth context
+  const { user } = useUser();
+
+  const squadLeaderId = user?.fullName;
 
   useEffect(() => {
     const unsub = onSnapshot(collection(db, 'soldiers'), (snapshot) => {
@@ -46,7 +49,7 @@ const SoldierList = ({ onSelectSoldier }) => {
                 onClick={() => onSelectSoldier(soldier)}
                 className="cursor-pointer"
               >
-                {soldier.data.name}
+                {soldier.data['Full Name']}
               </span>
               <button
                 onClick={() => handleDelete(soldier.id)}
