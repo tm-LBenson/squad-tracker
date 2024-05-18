@@ -12,7 +12,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from './UserContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import DragHandle from './DragHandle'; // Import the DragHandle component
+import DragHandle from './DragHandle';
 
 const TemplateEditor = ({ onSave, onCancel }) => {
   const [fields, setFields] = useState([]);
@@ -30,7 +30,6 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         setFields(templateData);
         setOriginalFields(templateData);
       } else {
-        // Add the default Full Name field if no template exists
         const defaultFields = [
           { name: 'Full Name', type: 'text', required: true, editable: false },
         ];
@@ -66,14 +65,12 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         const soldierData = soldierDoc.data().data;
         const updatedSoldierData = { ...soldierData };
 
-        // Add new fields
         newFields.forEach((field) => {
           if (!(field.name in updatedSoldierData)) {
             updatedSoldierData[field.name] = '';
           }
         });
 
-        // Remove deleted fields
         Object.keys(soldierData).forEach((key) => {
           if (!newFields.some((field) => field.name === key)) {
             delete updatedSoldierData[key];
@@ -103,7 +100,7 @@ const TemplateEditor = ({ onSave, onCancel }) => {
     onCancel();
   };
 
-  const handleDragEnd = (result) => {
+  const onDragEnd = (result) => {
     if (!result.destination) return;
     const reorderedFields = Array.from(fields);
     const [removed] = reorderedFields.splice(result.source.index, 1);
@@ -114,8 +111,8 @@ const TemplateEditor = ({ onSave, onCancel }) => {
   return (
     <div className="p-6 border rounded-lg shadow-md bg-white">
       <h2 className="text-2xl font-bold mb-4">Template Editor</h2>
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="fields">
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable-fields">
           {(provided) => (
             <div
               {...provided.droppableProps}
@@ -124,7 +121,7 @@ const TemplateEditor = ({ onSave, onCancel }) => {
               {fields.map((field, index) => (
                 <Draggable
                   key={index}
-                  draggableId={String(index)}
+                  draggableId={`field-${index}`}
                   index={index}
                 >
                   {(provided) => (
