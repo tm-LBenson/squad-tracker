@@ -31,6 +31,7 @@ const CompleteProfile = () => {
   const [platoon, setPlatoon] = useState('');
   const [position, setPosition] = useState('');
   const [squadNumber, setSquadNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const router = useRouter();
   const user = auth.currentUser;
 
@@ -57,6 +58,7 @@ const CompleteProfile = () => {
         platoon,
         position,
         squadNumber: position === 'Squad Leader' ? squadNumber : '',
+        phoneNumber,
         email: user.email,
         uid: user.uid,
         approved: false, // New users need to be approved
@@ -163,6 +165,16 @@ const CompleteProfile = () => {
               />
             </div>
           )}
+          <div className="mb-4">
+            <label className="block text-gray-700">Phone Number</label>
+            <input
+              type="text"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500"
+              required
+            />
+          </div>
           <button
             type="submit"
             className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition duration-200"

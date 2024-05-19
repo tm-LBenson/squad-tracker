@@ -1,0 +1,58 @@
+[debug] [2024-05-19T00:39:02.075Z] ----------------------------------------------------------------------
+[debug] [2024-05-19T00:39:02.076Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\tmlew\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2024-05-19T00:39:02.077Z] CLI Version:   13.9.0
+[debug] [2024-05-19T00:39:02.077Z] Platform:      win32
+[debug] [2024-05-19T00:39:02.077Z] Node Version:  v20.11.1
+[debug] [2024-05-19T00:39:02.077Z] Time:          Sat May 18 2024 20:39:02 GMT-0400 (Eastern Daylight Time)
+[debug] [2024-05-19T00:39:02.077Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-05-19T00:39:02.110Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-05-19T00:39:02.111Z] > authorizing via signed-in user (tm.lewisbenson@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\tmlew\OneDrive\Documents\Projects\squad-tracker
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2024-05-19T00:39:05.073Z] Using project from CLI flag: squad-tracker-12f25
+[debug] [2024-05-19T00:39:05.074Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/squad-tracker-12f25 [none]
+[debug] [2024-05-19T00:39:05.753Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/squad-tracker-12f25 200
+[debug] [2024-05-19T00:39:05.753Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/squad-tracker-12f25 {"projectId":"squad-tracker-12f25","projectNumber":"306845530848","displayName":"squad-tracker","name":"projects/squad-tracker-12f25","resources":{"hostingSite":"squad-tracker-12f25"},"state":"ACTIVE","etag":"1_0af88d01-1260-4d49-8149-e47dc292fdf2"}
+[info] i  Using project squad-tracker-12f25 (squad-tracker) 
+[info] 
+=== Functions Setup
+[debug] [2024-05-19T00:39:05.758Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-05-19T00:39:05.758Z] > authorizing via signed-in user (tm.lewisbenson@gmail.com)
+[debug] [2024-05-19T00:39:05.758Z] [iam] checking project squad-tracker-12f25 for permissions ["firebase.projects.get"]
+[debug] [2024-05-19T00:39:05.758Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/squad-tracker-12f25:testIamPermissions [none]
+[debug] [2024-05-19T00:39:05.758Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/squad-tracker-12f25:testIamPermissions x-goog-quota-user=projects/squad-tracker-12f25
+[debug] [2024-05-19T00:39:05.758Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/squad-tracker-12f25:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-05-19T00:39:06.040Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/squad-tracker-12f25:testIamPermissions 200
+[debug] [2024-05-19T00:39:06.040Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/squad-tracker-12f25:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-05-19T00:39:06.041Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/cloudfunctions.googleapis.com [none]
+[debug] [2024-05-19T00:39:06.041Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/squad-tracker-12f25
+[debug] [2024-05-19T00:39:06.042Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/runtimeconfig.googleapis.com [none]
+[debug] [2024-05-19T00:39:06.042Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/squad-tracker-12f25
+[debug] [2024-05-19T00:39:06.421Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/runtimeconfig.googleapis.com 200
+[debug] [2024-05-19T00:39:06.421Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2024-05-19T00:39:06.431Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/cloudfunctions.googleapis.com 200
+[debug] [2024-05-19T00:39:06.431Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/squad-tracker-12f25/services/cloudfunctions.googleapis.com [omitted]
+[info] 
+Detected existing codebase(s): default
+

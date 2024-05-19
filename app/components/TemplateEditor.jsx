@@ -14,6 +14,9 @@ import { useUser } from './UserContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import DragHandle from './DragHandle';
 
+const notificationTypes = ['None', 'SMS'];
+const notificationPeriods = [30, 60, 90];
+
 const TemplateEditor = ({ onSave, onCancel }) => {
   const [fields, setFields] = useState([]);
   const [originalFields, setOriginalFields] = useState([]);
@@ -30,8 +33,16 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         setFields(templateData);
         setOriginalFields(templateData);
       } else {
+        // Add the default Full Name field if no template exists
         const defaultFields = [
-          { name: 'Full Name', type: 'text', required: true, editable: false },
+          {
+            name: 'Full Name',
+            type: 'text',
+            required: true,
+            editable: false,
+            notification: 'None',
+            notificationPeriod: 0,
+          },
         ];
         setFields(defaultFields);
         setOriginalFields(defaultFields);
@@ -43,7 +54,14 @@ const TemplateEditor = ({ onSave, onCancel }) => {
   const addField = () => {
     setFields([
       ...fields,
-      { name: '', type: 'text', required: false, editable: true },
+      {
+        name: '',
+        type: 'text',
+        required: false,
+        editable: true,
+        notification: 'None',
+        notificationPeriod: 0,
+      },
     ]);
   };
 
@@ -65,12 +83,14 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         const soldierData = soldierDoc.data().data;
         const updatedSoldierData = { ...soldierData };
 
+        // Add new fields
         newFields.forEach((field) => {
           if (!(field.name in updatedSoldierData)) {
             updatedSoldierData[field.name] = '';
           }
         });
 
+        // Remove deleted fields
         Object.keys(soldierData).forEach((key) => {
           if (!newFields.some((field) => field.name === key)) {
             delete updatedSoldierData[key];
@@ -112,7 +132,7 @@ const TemplateEditor = ({ onSave, onCancel }) => {
     <div className="p-6 border rounded-lg shadow-md bg-white">
       <h2 className="text-2xl font-bold mb-4">Template Editor</h2>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="droppable-fields">
+        <Droppable droppableId="fields">
           {(provided) => (
             <div
               {...provided.droppableProps}
@@ -129,7 +149,7 @@ const TemplateEditor = ({ onSave, onCancel }) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className="flex items-center relative mb-3"
+                      className="flex items-center mb-3"
                     >
                       <DragHandle />
                       <input
@@ -164,6 +184,49 @@ const TemplateEditor = ({ onSave, onCancel }) => {
                       >
                         <option value="text">Text</option>
                         <option value="date">Date</option>
+                      </select>
+                      <select
+                        value={field.notification}
+                        onChange={(e) => {
+                          if (field.editable) {
+                            const newFields = [...fields];
+                            newFields[index].notification = e.target.value;
+                            setFields(newFields);
+                          }
+                        }}
+                        className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
+                        disabled={!field.editable}
+                      >
+                        {notificationTypes.map((type) => (
+                          <option
+                            key={type}
+                            value={type}
+                          >
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                      <select
+                        value={field.notificationPeriod}
+                        onChange={(e) => {
+                          if (field.editable) {
+                            const newFields = [...fields];
+                            newFields[index].notificationPeriod =
+                              e.target.value;
+                            setFields(newFields);
+                          }
+                        }}
+                        className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
+                        disabled={!field.editable}
+                      >
+                        {notificationPeriods.map((period) => (
+                          <option
+                            key={period}
+                            value={period}
+                          >
+                            {period} days
+                          </option>
+                        ))}
                       </select>
                       <label className="flex items-center mr-2">
                         <input
