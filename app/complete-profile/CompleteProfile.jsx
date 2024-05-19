@@ -21,7 +21,12 @@ const rankOptions = [
   'CPT',
 ];
 
-const positionOptions = ['Squad Leader'];
+const positionOptions = [
+  'Squad Leader',
+  'Team Leader',
+  'Platoon Sergeant',
+  'Platoon Leader',
+];
 
 const CompleteProfile = () => {
   const [firstName, setFirstName] = useState('');
