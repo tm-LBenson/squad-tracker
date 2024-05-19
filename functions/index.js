@@ -1,77 +1,85 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const twilio = require('twilio');
-require('dotenv').config();
 
 admin.initializeApp();
 
-const twilioClient = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN,
-);
+const accountSid = functions.config().twilio.account_sid;
+const authToken = functions.config().twilio.auth_token;
+const client = new twilio(accountSid, authToken);
+console.log('Sid', accountSid);
+console.log('Auth Token', authToken);
 
 exports.scheduledFieldCheck = functions.pubsub
-  .schedule('every 5 minutes')
+  .schedule('every 180 minutes')
   .onRun(async (context) => {
-    const today = new Date();
+    const now = new Date();
 
     const soldiersSnapshot = await admin
       .firestore()
       .collection('soldiers')
       .get();
+    await Promise.all(
+      soldiersSnapshot.docs.map(async (doc) => {
+        const soldier = doc.data();
+        const squadLeaderDoc = await admin
+          .firestore()
+          .collection('users')
+          .doc(soldier.squadLeaderId)
+          .get();
+        const squadLeader = squadLeaderDoc.data();
 
-    for (const soldierDoc of soldiersSnapshot.docs) {
-      const soldierData = soldierDoc.data().data;
-      const squadLeaderId = soldierDoc.data().squadLeaderId;
+        const templateDoc = await admin
+          .firestore()
+          .collection('templates')
+          .doc(soldier.squadLeaderId)
+          .get();
+        const templateFields = templateDoc.data().fields;
 
-      const userDoc = await admin
-        .firestore()
-        .collection('users')
-        .doc(squadLeaderId)
-        .get();
-      if (!userDoc.exists) {
-        console.error(`No user found with ID: ${squadLeaderId}`);
-        continue;
-      }
-      const phoneNumber = userDoc.data().phoneNumber;
-      if (!phoneNumber) {
-        console.error(`No phone number found for user ID: ${squadLeaderId}`);
-        continue;
-      }
+        await Promise.all(
+          templateFields.map(async (field) => {
+            if (field.notification === 'SMS' && field.name in soldier.data) {
+              const fieldValue = new Date(soldier.data[field.name]);
+              const daysDifference = Math.floor(
+                (fieldValue - now) / (1000 * 60 * 60 * 24),
+              );
 
-      const templateDoc = await admin
-        .firestore()
-        .collection('templates')
-        .doc(squadLeaderId)
-        .get();
-      if (templateDoc.exists) {
-        const fields = templateDoc.data().fields;
+              console.log(
+                `Field '${field.name}' for soldier '${
+                  soldier.data['Full Name']
+                }' is set to '${
+                  soldier.data[field.name]
+                }'. Notification period is '${
+                  field.notificationPeriod
+                }' days. Days difference is ${daysDifference} days.`,
+              );
 
-        for (const field of fields) {
-          if (field.notification === 'SMS' && field.type === 'date') {
-            const fieldValue = soldierData[field.name];
-            const fieldDate = new Date(fieldValue);
-            const diffTime = fieldDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays <= field.notificationPeriod) {
-              const message = `Reminder: Field '${field.name}' for soldier ${soldierData['Full Name']} is set to ${fieldValue}.`;
-
-              try {
-                const messageResponse = await twilioClient.messages.create({
-                  body: message,
-                  from: process.env.TWILIO_PHONE_NUMBER,
-                  to: phoneNumber, // Squad leader's phone number
-                });
-                console.log('Notification sent:', messageResponse.sid);
-              } catch (error) {
-                console.error('Error sending notification:', error);
+              if (daysDifference <= field.notificationPeriod) {
+                const message = `Field '${field.name}' for soldier '${soldier.data['Full Name']}' is due in ${daysDifference} days.`;
+                console.log(`Preparing to send SMS: ${message}`);
+                try {
+                  const response = await client.messages.create({
+                    body: message,
+                    from: functions.config().twilio.phone_number,
+                    to: squadLeader.phoneNumber,
+                  });
+                  console.log(
+                    `SMS sent to ${squadLeader.phoneNumber}: ${response.sid}`,
+                  );
+                } catch (error) {
+                  console.error(
+                    `Failed to send SMS to ${squadLeader.phoneNumber}:`,
+                    error,
+                  );
+                }
+              } else {
+                console.log(
+                  `Field '${field.name}' for soldier '${soldier.data['Full Name']}' is not within the notification period.`,
+                );
               }
             }
-          }
-        }
-      }
-    }
-
-    return null;
+          }),
+        );
+      }),
+    );
   });
