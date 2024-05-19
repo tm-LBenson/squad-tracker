@@ -7,11 +7,9 @@ admin.initializeApp();
 const accountSid = functions.config().twilio.account_sid;
 const authToken = functions.config().twilio.auth_token;
 const client = new twilio(accountSid, authToken);
-console.log('Sid', accountSid);
-console.log('Auth Token', authToken);
 
 exports.scheduledFieldCheck = functions.pubsub
-  .schedule('every 180 minutes')
+  .schedule('every 24 hours')
   .onRun(async (context) => {
     const now = new Date();
 
@@ -19,6 +17,7 @@ exports.scheduledFieldCheck = functions.pubsub
       .firestore()
       .collection('soldiers')
       .get();
+
     await Promise.all(
       soldiersSnapshot.docs.map(async (doc) => {
         const soldier = doc.data();
@@ -44,19 +43,9 @@ exports.scheduledFieldCheck = functions.pubsub
                 (fieldValue - now) / (1000 * 60 * 60 * 24),
               );
 
-              console.log(
-                `Field '${field.name}' for soldier '${
-                  soldier.data['Full Name']
-                }' is set to '${
-                  soldier.data[field.name]
-                }'. Notification period is '${
-                  field.notificationPeriod
-                }' days. Days difference is ${daysDifference} days.`,
-              );
-
               if (daysDifference <= field.notificationPeriod) {
                 const message = `Field '${field.name}' for soldier '${soldier.data['Full Name']}' is due in ${daysDifference} days.`;
-                console.log(`Preparing to send SMS: ${message}`);
+
                 try {
                   const response = await client.messages.create({
                     body: message,
@@ -72,10 +61,6 @@ exports.scheduledFieldCheck = functions.pubsub
                     error,
                   );
                 }
-              } else {
-                console.log(
-                  `Field '${field.name}' for soldier '${soldier.data['Full Name']}' is not within the notification period.`,
-                );
               }
             }
           }),
