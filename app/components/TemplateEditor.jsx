@@ -13,10 +13,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from './UserContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import DragHandle from './DragHandle';
-import ConsentModal from './ConsestModal';
-
-const notificationTypes = ['None', 'SMS'];
-const notificationPeriods = [30, 60, 90];
+import ConsentModal from './ConsentModal';
+import FieldEditor from './FieldEditor';
+import ConfirmDeleteModal from './ConfirmDeleteModal';
 
 const TemplateEditor = ({ onSave, onCancel }) => {
   const [fields, setFields] = useState([]);
@@ -169,108 +168,14 @@ const TemplateEditor = ({ onSave, onCancel }) => {
                       className="flex items-center mb-3"
                     >
                       <DragHandle />
-                      <input
-                        type="text"
-                        value={field.name}
-                        onChange={(e) => {
-                          if (field.editable) {
-                            const newFields = [...fields];
-                            newFields[index].name = e.target.value;
-                            setFields(newFields);
-                          }
-                        }}
-                        placeholder="Field Name"
-                        className={
-                          field.editable
-                            ? 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-black'
-                            : 'px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2 text-slate-400'
-                        }
-                        disabled={!field.editable}
+                      <FieldEditor
+                        field={field}
+                        index={index}
+                        fields={fields}
+                        setFields={setFields}
+                        handleNotificationChange={handleNotificationChange}
+                        confirmRemoveField={confirmRemoveField}
                       />
-                      <select
-                        value={field.type}
-                        onChange={(e) => {
-                          if (field.editable) {
-                            const newFields = [...fields];
-                            newFields[index].type = e.target.value;
-                            setFields(newFields);
-                          }
-                        }}
-                        className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
-                        disabled={!field.editable}
-                      >
-                        <option value="text">Text</option>
-                        <option value="date">Date</option>
-                      </select>
-                      <select
-                        value={field.notification}
-                        onChange={(e) =>
-                          handleNotificationChange(index, e.target.value)
-                        }
-                        className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
-                      >
-                        {notificationTypes.map((type) => (
-                          <option
-                            key={type}
-                            value={type}
-                          >
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                      <select
-                        value={field.notificationPeriod}
-                        onChange={(e) => {
-                          if (field.editable) {
-                            const newFields = [...fields];
-                            newFields[index].notificationPeriod =
-                              e.target.value;
-                            setFields(newFields);
-                          }
-                        }}
-                        className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
-                        disabled={!field.editable}
-                      >
-                        {notificationPeriods.map((period) => (
-                          <option
-                            key={period}
-                            value={period}
-                          >
-                            {period} days
-                          </option>
-                        ))}
-                      </select>
-                      <label className="flex items-center mr-2">
-                        <input
-                          type="checkbox"
-                          checked={field.required}
-                          onChange={(e) => {
-                            if (field.editable) {
-                              const newFields = [...fields];
-                              newFields[index].required = e.target.checked;
-                              setFields(newFields);
-                            }
-                          }}
-                          className="mr-1"
-                          disabled={!field.editable}
-                        />
-                        Required
-                      </label>
-                      {field.editable ? (
-                        <button
-                          onClick={() => confirmRemoveField(index)}
-                          className="p-2 bg-red-500 text-white rounded"
-                        >
-                          Remove
-                        </button>
-                      ) : (
-                        <button
-                          className="p-2 bg-slate-400 text-white rounded"
-                          disabled
-                        >
-                          Remove
-                        </button>
-                      )}
                     </div>
                   )}
                 </Draggable>
@@ -301,26 +206,11 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         </button>
       </div>
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded shadow-md">
-            <h3 className="text-xl mb-4">Confirm Delete</h3>
-            <p>Are you sure you want to delete this field?</p>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
-                onClick={() => setShowModal(false)}
-                className="p-2 bg-gray-300 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => removeField(deleteIndex)}
-                className="p-2 bg-red-500 text-white rounded"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDeleteModal
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          removeField={() => removeField(deleteIndex)}
+        />
       )}
       <ConsentModal
         show={showConsentModal}
