@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useUser } from './UserContext';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import DragHandle from './DragHandle';
+import ConsentModal from './ConsestModal';
 
 const notificationTypes = ['None', 'SMS'];
 const notificationPeriods = [30, 60, 90];
@@ -22,6 +23,8 @@ const TemplateEditor = ({ onSave, onCancel }) => {
   const [originalFields, setOriginalFields] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [selectedFieldIndex, setSelectedFieldIndex] = useState(null);
   const { user } = useUser();
   const squadLeaderId = user?.uid;
 
@@ -33,7 +36,6 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         setFields(templateData);
         setOriginalFields(templateData);
       } else {
-        // Add the default Full Name field if no template exists
         const defaultFields = [
           {
             name: 'Full Name',
@@ -83,14 +85,12 @@ const TemplateEditor = ({ onSave, onCancel }) => {
         const soldierData = soldierDoc.data().data;
         const updatedSoldierData = { ...soldierData };
 
-        // Add new fields
         newFields.forEach((field) => {
           if (!(field.name in updatedSoldierData)) {
             updatedSoldierData[field.name] = '';
           }
         });
 
-        // Remove deleted fields
         Object.keys(soldierData).forEach((key) => {
           if (!newFields.some((field) => field.name === key)) {
             delete updatedSoldierData[key];
@@ -126,6 +126,23 @@ const TemplateEditor = ({ onSave, onCancel }) => {
     const [removed] = reorderedFields.splice(result.source.index, 1);
     reorderedFields.splice(result.destination.index, 0, removed);
     setFields(reorderedFields);
+  };
+
+  const handleNotificationChange = (index, value) => {
+    if (value === 'SMS') {
+      setSelectedFieldIndex(index);
+      setShowConsentModal(true);
+    } else {
+      const newFields = [...fields];
+      newFields[index].notification = value;
+      setFields(newFields);
+    }
+  };
+
+  const handleConsent = () => {
+    const newFields = [...fields];
+    newFields[selectedFieldIndex].notification = 'SMS';
+    setFields(newFields);
   };
 
   return (
@@ -187,15 +204,10 @@ const TemplateEditor = ({ onSave, onCancel }) => {
                       </select>
                       <select
                         value={field.notification}
-                        onChange={(e) => {
-                          if (field.editable) {
-                            const newFields = [...fields];
-                            newFields[index].notification = e.target.value;
-                            setFields(newFields);
-                          }
-                        }}
+                        onChange={(e) =>
+                          handleNotificationChange(index, e.target.value)
+                        }
                         className="px-4 py-2.5 text-lg rounded-md bg-white border border-gray-400 w-full outline-blue-500 mr-2"
-                        disabled={!field.editable}
                       >
                         {notificationTypes.map((type) => (
                           <option
@@ -310,6 +322,11 @@ const TemplateEditor = ({ onSave, onCancel }) => {
           </div>
         </div>
       )}
+      <ConsentModal
+        show={showConsentModal}
+        handleClose={() => setShowConsentModal(false)}
+        handleConsent={handleConsent}
+      />
       <ToastContainer />
     </div>
   );
